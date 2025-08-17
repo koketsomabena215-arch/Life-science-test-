@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grade 10 Life Sciences Test Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1, h2 {
+      color: #006600;
+    }
+    .question {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #006600;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004d00;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e6ffe6;
+      border: 1px solid #006600;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grade 10 Life Sciences Test Generator</h1>
+  <p>Enter a topic (e.g., Photosynthesis, Human Digestive System) to generate a test:</p>
+
+  <input type="text" id="topic" size="40" placeholder="Enter Life Sciences topic here">
+  <button onclick="generateTest()">Generate Test</button>
+
+  <h2>Test</h2>
+  <form id="testForm"></form>
+
+  <button onclick="submitTest()">Submit Test</button>
+
+  <div id="result"></div>
+
+  <script>
+    // Dummy questions generator (you can extend this logic)
+    function generateTest() {
+      const topic = document.getElementById("topic").value || "Life Sciences";
+      const testForm = document.getElementById("testForm");
+      testForm.innerHTML = "";
+
+      const questions = [
+        { q: `What is the main function of ${topic}?`, a: "To support life processes." },
+        { q: `True or False: ${topic} is essential for Grade 10 learners.`, a: "True" },
+        { q: `Choose the correct statement about ${topic}:`, 
+          options: [
+            "It has no role in biology.",
+            "It is part of Life Sciences studies.",
+            "It is unrelated to ecosystems."
+          ], 
+          a: "It is part of Life Sciences studies." }
+      ];
+
+      questions.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+        let html = `<p><b>Q${index+1}:</b> ${item.q}</p>`;
+        
+        if (item.options) {
+          item.options.forEach(opt => {
+            html += `<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`;
+          });
+        } else if (item.q.startsWith("True or False")) {
+          html += `<label><input type="radio" name="q${index}" value="True"> True</label><br>`;
+          html += `<label><input type="radio" name="q${index}" value="False"> False</label><br>`;
+        } else {
+          html += `<input type="text" name="q${index}" size="50">`;
+        }
+
+        div.innerHTML = html;
+        testForm.appendChild(div);
+      });
+
+      // Store answers
+      window.correctAnswers = questions.map(q => q.a);
+    }
+
+    function submitTest() {
+      const form = document.getElementById("testForm");
+      let score = 0;
+      const total = window.correctAnswers ? window.correctAnswers.length : 0;
+
+      window.correctAnswers.forEach((answer, i) => {
+        const inputs = form.querySelectorAll(`[name="q${i}"]`);
+        let userAnswer = "";
+        inputs.forEach(input => {
+          if ((input.type === "radio" || input.type === "checkbox") && input.checked) {
+            userAnswer = input.value;
+          } else if (input.type === "text") {
+            userAnswer = input.value.trim();
+          }
+        });
+        if (userAnswer.toLowerCase() === answer.toLowerCase()) {
+          score++;
+        }
+      });
+
+      document.getElementById("result").innerText = 
+        `You scored ${score} out of ${total} marks.`;
+    }
+  </script>
+</body>
+</html>
