@@ -1,126 +1,458 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Grade 10 Life Sciences Test Generator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f9f9f9;
-      color: #333;
-    }
-    h1, h2 {
-      color: #006600;
-    }
-    .question {
-      margin-bottom: 15px;
-      padding: 10px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    button {
-      background: #006600;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #004d00;
-    }
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #e6ffe6;
-      border: 1px solid #006600;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRADE 10 LIFE SCIENCES TEST</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f4f9; color: #333; margin: 0; padding: 0; }
+header { background: #4CAF50; color: white; padding: 20px; text-align: center; font-size: 24px; text-transform: uppercase; }
+main { padding: 20px; max-width: 900px; margin: auto; }
+.question { margin-bottom: 20px; }
+.answer { display: block; width: 100%; padding: 8px; margin-top: 5px; }
+button { padding: 10px 20px; margin: 10px 0; cursor: pointer; background: #4CAF50; color: white; border: none; text-transform: uppercase; font-weight: bold; }
+.hidden { display: none; }
+.result { background: #e0f7fa; padding: 15px; margin-top: 20px; border-radius: 8px; }
+.right-answer { color: green; font-weight: bold; }
+.wrong-answer { color: red; font-weight: bold; }
+.fact { margin-top: 10px; font-style: italic; }
+select { padding: 8px; font-size: 16px; margin-bottom: 10px; }
+img.diagram { max-width: 100%; margin-top: 10px; border: 1px solid #ccc; }
+</style>
 </head>
 <body>
-  <h1>Grade 10 Life Sciences Test Generator</h1>
-  <p>Enter a topic (e.g., Photosynthesis, Human Digestive System) to generate a test:</p>
+<header>GRADE 10 LIFE SCIENCES TEST</header>
+<main>
+  <div id="start-screen">
+    <h2>Welcome to the Life Sciences Test</h2>
+    <p>Select Term:</p>
+    <select id="termSelect">
+      <option value="1">Term 1</option>
+      <option value="2">Term 2</option>
+      <option value="3">Term 3</option>
+      <option value="4">Term 4</option>
+    </select>
+    <p>Choose number of questions:</p>
+    <select id="numQuestions">
+      <option value="40">40 Questions</option>
+      <option value="50">50 Questions</option>
+      <option value="60">60 Questions</option>
+      <option value="70">70 Questions</option>
+      <option value="80">80 Questions</option>
+      <option value="90">90 Questions</option>
+      <option value="100">100 Questions</option>
+      <option value="110">110 Questions</option>
+    </select>
+    <button onclick="startTest()">Start Test</button>
+  </div>
 
-  <input type="text" id="topic" size="40" placeholder="Enter Life Sciences topic here">
-  <button onclick="generateTest()">Generate Test</button>
+  <div id="test-screen" class="hidden">
+    <div id="timer" style="font-weight:bold; margin-bottom:10px;"></div>
+    <div id="question-container"></div>
+    <button onclick="submitAnswer()">Submit Answer</button>
+  </div>
 
-  <h2>Test</h2>
-  <form id="testForm"></form>
+  <div id="result-screen" class="hidden">
+    <h2>TEST COMPLETE</h2>
+    <div id="score"></div>
+    <div id="motivational-quote" style="margin-top:10px; font-style:italic;"></div>
+    <div id="extra-facts" style="margin-top:10px;"></div>
+    <button onclick="restartTest()">Restart Test</button>
+  </div>
+</main>
 
-  <button onclick="submitTest()">Submit Test</button>
+<script>
+// ----------------------------
+// FULL QUESTION BANKS (110 per term)
+// Only first 10 shown per term here for brevity; pattern repeats to 110
+// Replace 'img/diagramX.png' with real images if available
+// ----------------------------
 
-  <div id="result"></div>
+// Term 1
+const term1 = [
+  {q:"What is the basic unit of life?", a:"Cell", e:"All living organisms are composed of cells."},
+  {q:"Name the process by which plants make food.", a:"Photosynthesis", e:"Plants convert sunlight into chemical energy."},
+  {q:"Identify the structure in the diagram.", a:"Mitochondria", e:"Mitochondria generate ATP.", img:"img/diagram1.png"},
+  {q:"What is the function of the nucleus?", a:"Stores genetic material", e:"Nucleus contains DNA and controls cell activities."},
+  {q:"What organelle performs photosynthesis?", a:"Chloroplast", e:"Chloroplasts contain chlorophyll to capture sunlight.", img:"img/diagram2.png"},
+  {q:"What is the process of cellular respiration?", a:"Breakdown of glucose to release energy", e:"Occurs in mitochondria."},
+  {q:"Define osmosis.", a:"Movement of water across a membrane", e:"Water moves from high to low concentration."},
+  {q:"Name the type of cell without a nucleus.", a:"Prokaryotic cell", e:"Bacteria are prokaryotic."},
+  {q:"Identify the structure in the diagram.", a:"Cell membrane", e:"Controls entry and exit of substances.", img:"img/diagram3.png"},
+  {q:"What is the function of ribosomes?", a:"Protein synthesis", e:"Ribosomes assemble amino acids into proteins."},
+  // ... repeat pattern until 110 questions ...
+];
 
-  <script>
-    // Dummy questions generator (you can extend this logic)
-    function generateTest() {
-      const topic = document.getElementById("topic").value || "Life Sciences";
-      const testForm = document.getElementById("testForm");
-      testForm.innerHTML = "";
+// Term 2
+const term2 = [
+  {q:"What is an acid?", a:"Substance that donates protons (H+)", e:"Acids release H+ ions in water."},
+  {q:"What is a base?", a:"Substance that accepts protons (H+)", e:"Bases reduce H+ concentration."},
+  {q:"Define pH.", a:"Measure of hydrogen ion concentration", e:"pH < 7 is acidic, pH = 7 neutral, pH > 7 basic."},
+  {q:"Name a strong acid.", a:"Hydrochloric acid", e:"HCl completely dissociates in water."},
+  {q:"Name a strong base.", a:"Sodium hydroxide", e:"NaOH completely dissociates in water."},
+  {q:"Identify the labeled part in the diagram.", a:"Litmus solution", e:"Litmus indicates acidic or basic conditions.", img:"img/diagram4.png"},
+  {q:"What is neutralization?", a:"Reaction between acid and base to form salt and water", e:"HCl + NaOH → NaCl + H2O."},
+  {q:"Define buffer.", a:"Solution that resists pH change", e:"Buffers maintain stable pH."},
+  {q:"What is amphoteric substance?", a:"Can act as acid or base", e:"Example: Water."},
+  {q:"What is the pH of pure water?", a:"7", e:"Water is neutral at room temperature."},
+  // ... repeat pattern until 110 questions ...
+];
 
-      const questions = [
-        { q: `What is the main function of ${topic}?`, a: "To support life processes." },
-        { q: `True or False: ${topic} is essential for Grade 10 learners.`, a: "True" },
-        { q: `Choose the correct statement about ${topic}:`, 
-          options: [
-            "It has no role in biology.",
-            "It is part of Life Sciences studies.",
-            "It is unrelated to ecosystems."
-          ], 
-          a: "It is part of Life Sciences studies." }
-      ];
+// Term 3
+const term3 = [
+  {q:"What is chemical bonding?", a:"Interaction that holds atoms together", e:"Includes ionic, covalent, and metallic bonds."},
+  {q:"Define ionic bond.", a:"Transfer of electrons from one atom to another", e:"Forms positive and negative ions."},
+  {q:"Define covalent bond.", a:"Sharing of electron pairs between atoms", e:"Forms molecules."},
+  {q:"Define metallic bond.", a:"Electrons shared over metal lattice", e:"Explains conductivity and malleability."},
+  {q:"What is electronegativity?", a:"Ability of an atom to attract electrons", e:"Determines bond polarity."},
+  {q:"Difference between polar and nonpolar covalent bonds?", a:"Polar: unequal sharing; Nonpolar: equal sharing", e:"Polar bonds create partial charges."},
+  {q:"What is a molecule?", a:"Two or more atoms bonded together", e:"H2O, CO2 are examples."},
+  {q:"What is a compound?", a:"Substance made of two or more different elements chemically bonded", e:"NaCl is a compound."},
+  {q:"Define ion.", a:"Atom or molecule with a charge", e:"Cations are positive; anions are negative."},
+  {q:"Label the ionic bond in the diagram.", a:"NaCl", e:"Na transfers electron to Cl forming an ionic bond.", img:"img/diagram5.png"},
+  // ... repeat pattern until 110 questions ...
+];
 
-      questions.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "question";
-        let html = `<p><b>Q${index+1}:</b> ${item.q}</p>`;
-        
-        if (item.options) {
-          item.options.forEach(opt => {
-            html += `<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`;
-          });
-        } else if (item.q.startsWith("True or False")) {
-          html += `<label><input type="radio" name="q${index}" value="True"> True</label><br>`;
-          html += `<label><input type="radio" name="q${index}" value="False"> False</label><br>`;
-        } else {
-          html += `<input type="text" name="q${index}" size="50">`;
-        }
+// Term 4
+const term4 = [
+  {q:"What is a chemical reaction?", a:"Process that changes substances into new ones", e:"Reactants are converted into products."},
+  {q:"Define exothermic reaction.", a:"Reaction that releases energy", e:"Usually heat or light is released."},
+  {q:"Define endothermic reaction.", a:"Reaction that absorbs energy", e:"Energy is absorbed from surroundings."},
+  {q:"Law of conservation of mass?", a:"Mass is neither created nor destroyed in a reaction", e:"Total mass of reactants = total mass of products."},
+  {q:"What is a catalyst?", a:"Speeds up a reaction without being consumed", e:"Lowers activation energy."},
+  {q:"Define rate of reaction.", a:"Speed at which reactants are converted to products", e:"Affected by temperature, concentration, surface area, catalyst."},
+  {q:"What is a reversible reaction?", a:"Reaction that can go forwards and backwards", e:"Example: N2 + 3H2 ⇌ 2NH3."},
+  {q:"Define equilibrium.", a:"State where forward and backward reactions occur at the same rate", e:"Concentrations remain constant."},
+  {q:"Identify the product in the diagram.", a:"H2O", e:"Water is formed in this reaction.", img:"img/diagram6.png"},
+  {q:"Define oxidation.", a:"Loss of electrons", e:"OIL = Oxidation Is Loss."},
+  // ... repeat pattern until 110 questions ...
+];
 
-        div.innerHTML = html;
-        testForm.appendChild(div);
-      });
+// Motivational quotes
+const quotes = [
+  "Success is the sum of small efforts repeated daily.",
+  "Believe you can and you're halfway there.",
+  "Mistakes are proof that you are trying.",
+  "Knowledge is power. Keep learning.",
+  "Stay positive, work hard, make it happen."
+];
 
-      // Store answers
-      window.correctAnswers = questions.map(q => q.a);
-    }
+// ----------------------------
+// APP LOGIC
+// ----------------------------
+let currentTerm = [];
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
 
-    function submitTest() {
-      const form = document.getElementById("testForm");
-      let score = 0;
-      const total = window.correctAnswers ? window.correctAnswers.length : 0;
+function startTest() {
+  const term = document.getElementById("termSelect").value;
+  const num = parseInt(document.getElementById("numQuestions").value);
 
-      window.correctAnswers.forEach((answer, i) => {
-        const inputs = form.querySelectorAll(`[name="q${i}"]`);
-        let userAnswer = "";
-        inputs.forEach(input => {
-          if ((input.type === "radio" || input.type === "checkbox") && input.checked) {
-            userAnswer = input.value;
-          } else if (input.type === "text") {
-            userAnswer = input.value.trim();
-          }
-        });
-        if (userAnswer.toLowerCase() === answer.toLowerCase()) {
-          score++;
-        }
-      });
+  if(term==="1") currentTerm = [...term1];
+  if(term==="2") currentTerm = [...term2];
+  if(term==="3") currentTerm = [...term3];
+  if(term==="4") currentTerm = [...term4];
 
-      document.getElementById("result").innerText = 
-        `You scored ${score} out of ${total} marks.`;
-    }
-  </script>
+  currentTerm.sort(() => 0.5 - Math.random());
+  currentQuestions = currentTerm.slice(0, num);
+
+  currentIndex = 0;
+  score = 0;
+
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("test-screen").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = currentQuestions[currentIndex];
+  const container = document.getElementById("question-container");
+  container.innerHTML = `
+    <div class="question"><strong>Question ${currentIndex+1}:</strong> ${q.q}</div>
+    ${q.img ? `<img src="${q.img}" class="diagram">` : ""}
+    <input type="text" id="answer" class="answer" placeholder="Type your answer here">
+  `;
+}
+
+function submitAnswer() {
+  const ans = document.getElementById("answer").value.trim();
+  const correct = currentQuestions[currentIndex].a.trim();
+
+  if(ans.toLowerCase() === correct.toLowerCase()) score++;
+
+  currentIndex++;
+  if(currentIndex < currentQuestions.length) {
+    showQuestion();
+  } else {
+    finishTest();
+  }
+}
+
+function finishTest() {
+  document.getElementById("test-screen").classList.add("hidden");
+  document.getElementById("result-screen").classList.remove("hidden");
+
+  const scorePercent = ((score/currentQuestions.length)*100).toFixed(1);
+  document.getElementById("score").innerHTML = `You answered ${score} out of ${currentQuestions.length} questions correctly (${scorePercent}%).`;
+
+  const randomQuote = quotes[Math.floor(Math.random()*quotes.length)];
+  document.getElementById("motivational-quote").innerText = randomQuote;
+
+  let factsHTML = "";
+  currentQuestions.forEach((q, idx) => {
+    factsHTML += `<div class="${q.a.toLowerCase()===q.a.toLowerCase() ? 'right-answer':'wrong-answer'}">
+                    Q${idx+1}: ${q.q} <br> Correct Answer: ${q.a} <br> Explanation: ${q.e}
+                  </div><hr>`;
+  });
+  document.getElementById("extra-facts").innerHTML = factsHTML;
+}
+
+function restartTest() {
+  document.getElementById("result-screen").classList.add("hidden");
+  document.getElementById("start-screen").classList.remove("hidden");
+}
+</script>
 </body>
 </html>
+const term1 = [
+  {q:"What is the basic unit of life?", a:"Cell", e:"All living organisms are composed of cells."},
+  {q:"Name the process by which plants make food.", a:"Photosynthesis", e:"Plants convert sunlight into chemical energy."},
+  {q:"Identify the structure in the diagram.", a:"Mitochondria", e:"Mitochondria generate ATP.", img:"img/diagram1.png"},
+  {q:"What is the function of the nucleus?", a:"Stores genetic material", e:"Nucleus contains DNA and controls cell activities."},
+  {q:"What organelle performs photosynthesis?", a:"Chloroplast", e:"Chloroplasts contain chlorophyll to capture sunlight.", img:"img/diagram2.png"},
+  {q:"What is the process of cellular respiration?", a:"Breakdown of glucose to release energy", e:"Occurs in mitochondria."},
+  {q:"Define osmosis.", a:"Movement of water across a membrane", e:"Water moves from high to low concentration."},
+  {q:"Name the type of cell without a nucleus.", a:"Prokaryotic cell", e:"Bacteria are prokaryotic."},
+  {q:"Identify the structure in the diagram.", a:"Cell membrane", e:"Controls entry and exit of substances.", img:"img/diagram3.png"},
+  {q:"What is the function of ribosomes?", a:"Protein synthesis", e:"Ribosomes assemble amino acids into proteins."},
+  {q:"Define diffusion.", a:"Movement of molecules from high to low concentration", e:"Passive transport without energy."},
+  {q:"What is the cell wall made of?", a:"Cellulose", e:"Provides structure and protection for plant cells."},
+  {q:"Identify the organelle responsible for detoxifying chemicals.", a:"Smooth ER", e:"Smooth ER metabolizes toxins and synthesizes lipids.", img:"img/diagram4.png"},
+  {q:"What is the function of lysosomes?", a:"Break down waste and cellular debris", e:"Contain digestive enzymes."},
+  {q:"Define tissue.", a:"Group of similar cells performing a function", e:"E.g., muscle tissue."},
+  {q:"Define organ.", a:"Group of tissues performing a function", e:"E.g., heart."},
+  {q:"Name the pigment responsible for green color in plants.", a:"Chlorophyll", e:"Captures light energy for photosynthesis."},
+  {q:"Identify the structure labeled in the diagram.", a:"Endoplasmic Reticulum", e:"ER transports proteins and lipids.", img:"img/diagram5.png"},
+  {q:"What is the function of the Golgi apparatus?", a:"Modify, sort, and package proteins", e:"Prepares proteins for transport."},
+  {q:"Define homeostasis.", a:"Maintenance of stable internal conditions", e:"Essential for survival."},
+  // ... continue this pattern until reaching 110 questions ...
+];
+const term2 = [
+  {q:"What is an acid?", a:"Substance that donates protons (H+)", e:"Acids release H+ ions in water."},
+  {q:"What is a base?", a:"Substance that accepts protons (H+)", e:"Bases reduce H+ concentration."},
+  {q:"Define pH.", a:"Measure of hydrogen ion concentration", e:"pH < 7 is acidic, pH = 7 neutral, pH > 7 basic."},
+  {q:"Name a strong acid.", a:"Hydrochloric acid", e:"HCl completely dissociates in water."},
+  {q:"Name a strong base.", a:"Sodium hydroxide", e:"NaOH completely dissociates in water."},
+  {q:"Identify the labeled part in the diagram.", a:"Litmus solution", e:"Litmus indicates acidic or basic conditions.", img:"img/diagram6.png"},
+  {q:"What is neutralization?", a:"Reaction between acid and base to form salt and water", e:"HCl + NaOH → NaCl + H2O."},
+  {q:"Define buffer.", a:"Solution that resists pH change", e:"Buffers maintain stable pH."},
+  {q:"What is amphoteric substance?", a:"Can act as acid or base", e:"Example: Water."},
+  {q:"What is the pH of pure water?", a:"7", e:"Water is neutral at room temperature."},
+  {q:"Identify the diagram showing a strong acid.", a:"Hydrochloric acid solution", e:"HCl fully dissociates.", img:"img/diagram7.png"},
+  {q:"Define titration.", a:"Technique to determine unknown concentration", e:"Uses neutralization."},
+  {q:"What is an indicator?", a:"Substance showing color change with pH", e:"Example: phenolphthalein."},
+  {q:"Give an example of a weak acid.", a:"Acetic acid", e:"Partially dissociates in water."},
+  {q:"Give an example of a weak base.", a:"Ammonia", e:"Partially accepts protons."},
+  {q:"What is the product of acid + metal?", a:"Salt and hydrogen gas", e:"Example: Zn + HCl → ZnCl2 + H2."},
+  {q:"Define strong acid.", a:"Completely ionizes in water", e:"Strong acids dissociate fully."},
+  {q:"Define weak acid.", a:"Partially ionizes in water", e:"Weak acids do not fully dissociate."},
+  {q:"Explain neutral solution.", a:"pH = 7", e:"Equal H+ and OH- concentration."},
+  {q:"Identify the diagram showing titration.", a:"Burette and flask", e:"Used to measure volume during titration.", img:"img/diagram8.png"},
+  // ... continue this pattern until reaching 110 questions ...
+];
+const term3 = [
+  {q:"What is chemical bonding?", a:"Interaction that holds atoms together", e:"Includes ionic, covalent, and metallic bonds."},
+  {q:"Define ionic bond.", a:"Transfer of electrons from one atom to another", e:"Forms positive and negative ions."},
+  {q:"Define covalent bond.", a:"Sharing of electron pairs between atoms", e:"Forms molecules."},
+  {q:"Define metallic bond.", a:"Electrons shared over metal lattice", e:"Explains conductivity and malleability."},
+  {q:"What is electronegativity?", a:"Ability of an atom to attract electrons", e:"Determines bond polarity."},
+  {q:"Difference between polar and nonpolar covalent bonds?", a:"Polar: unequal sharing; Nonpolar: equal sharing", e:"Polar bonds create partial charges."},
+  {q:"What is a molecule?", a:"Two or more atoms bonded together", e:"H2O, CO2 are examples."},
+  {q:"What is a compound?", a:"Substance made of two or more different elements chemically bonded", e:"NaCl is a compound."},
+  {q:"Define ion.", a:"Atom or molecule with a charge", e:"Cations are positive; anions are negative."},
+  {q:"Label the ionic bond in the diagram.", a:"NaCl", e:"Na transfers electron to Cl forming an ionic bond.", img:"img/diagram9.png"},
+  {q:"Identify the covalent bond in the diagram.", a:"H2 molecule", e:"Hydrogen atoms share electrons.", img:"img/diagram10.png"},
+  {q:"Define polar molecule.", a:"Molecule with partial positive and negative charges", e:"Example: H2O."},
+  {q:"Define nonpolar molecule.", a:"Molecule with equal sharing of electrons", e:"Example: O2."},
+  {q:"Explain metallic bonding.", a:"Delocalized electrons in metal lattice", e:"Gives conductivity and malleability."},
+  {q:"What is a Lewis structure?", a:"Diagram showing valence electrons", e:"Used to represent molecules."},
+  {q:"Identify the diagram showing metallic bond.", a:"Metal lattice with delocalized electrons", e:"Electrons move freely in metal.", img:"img/diagram11.png"},
+  {q:"Define double bond.", a:"Two shared electron pairs", e:"Example: O2."},
+  {q:"Define triple bond.", a:"Three shared electron pairs", e:"Example: N2."},
+  {q:"Explain ionic crystal lattice.", a:"Alternating cations and anions", e:"Gives high melting point.", img:"img/diagram12.png"},
+  {q:"Difference between molecule and compound?", a:"Molecule: same or different atoms; Compound: only different atoms", e:"All compounds are molecules but not all molecules are compounds."},
+  // ... continue this pattern until reaching 110 questions ...
+];
+const term4 = [
+  {q:"What is a chemical reaction?", a:"Process that changes substances into new ones", e:"Reactants are converted into products."},
+  {q:"Define exothermic reaction.", a:"Reaction that releases energy", e:"Usually heat or light is released."},
+  {q:"Define endothermic reaction.", a:"Reaction that absorbs energy", e:"Energy is absorbed from surroundings."},
+  {q:"Law of conservation of mass?", a:"Mass is neither created nor destroyed in a reaction", e:"Total mass of reactants = total mass of products."},
+  {q:"What is a catalyst?", a:"Speeds up a reaction without being consumed", e:"Lowers activation energy."},
+  {q:"Define rate of reaction.", a:"Speed at which reactants are converted to products", e:"Affected by temperature, concentration, surface area, catalyst."},
+  {q:"What is a reversible reaction?", a:"Reaction that can go forwards and backwards", e:"Example: N2 + 3H2 ⇌ 2NH3."},
+  {q:"Define equilibrium.", a:"State where forward and backward reactions occur at the same rate", e:"Concentrations remain constant."},
+  {q:"Identify the product in the diagram.", a:"H2O", e:"Water is formed in this reaction.", img:"img/diagram13.png"},
+  {q:"Define oxidation.", a:"Loss of electrons", e:"OIL = Oxidation Is Loss."},
+  {q:"Define reduction.", a:"Gain of electrons", e:"RIG = Reduction Is Gain."},
+  {q:"What is redox reaction?", a:"Reaction involving both oxidation and reduction", e:"Electron transfer occurs."},
+  {q:"Define activation energy.", a:"Minimum energy required for reaction", e:"Catalysts lower this energy."},
+  {q:"Identify exothermic reaction in diagram.", a:"Combustion of fuel", e:"Heat released.", img:"img/diagram14.png"},
+  {q:"Identify endothermic reaction in diagram.", a:"Photosynthesis", e:"Energy absorbed from sunlight.", img:"img/diagram15.png"},
+  {q:"Explain reversible reaction in lab.", a:"Forward and backward reaction rates equal", e:"No net change in concentration."},
+  {q:"What is dynamic equilibrium?", a:"Concentrations constant over time", e:"Forward and backward reactions continue."},
+  {q:"Explain effect of temperature on reaction rate.", a:"Higher temperature increases rate", e:"Particles collide more often with more energy."},
+  {q:"Explain effect of concentration on reaction rate.", a:"Higher concentration increases rate", e:"More particles lead to more collisions."},
+  {q:"Explain effect of catalyst on reaction rate.", a:"Speeds up reaction without being consumed", e:"Lowers activation energy."},
+  // ... continue this pattern until reaching 110 questions ...
+];
+const term1 = [
+  {q:"What is the basic unit of life?", a:"Cell", e:"All living organisms are composed of cells."},
+  {q:"Name the process by which plants make food.", a:"Photosynthesis", e:"Plants convert sunlight into chemical energy."},
+  {q:"Identify the structure in the diagram.", a:"Mitochondria", e:"Mitochondria generate ATP.", img:"img/diagram1.png"},
+  {q:"What is the function of the nucleus?", a:"Stores genetic material", e:"Nucleus contains DNA and controls cell activities."},
+  {q:"What organelle performs photosynthesis?", a:"Chloroplast", e:"Chloroplasts contain chlorophyll to capture sunlight.", img:"img/diagram2.png"},
+  {q:"What is the process of cellular respiration?", a:"Breakdown of glucose to release energy", e:"Occurs in mitochondria."},
+  {q:"Define osmosis.", a:"Movement of water across a membrane", e:"Water moves from high to low concentration."},
+  {q:"Name the type of cell without a nucleus.", a:"Prokaryotic cell", e:"Bacteria are prokaryotic."},
+  {q:"Identify the structure in the diagram.", a:"Cell membrane", e:"Controls entry and exit of substances.", img:"img/diagram3.png"},
+  {q:"What is the function of ribosomes?", a:"Protein synthesis", e:"Ribosomes assemble amino acids into proteins."},
+  {q:"Define diffusion.", a:"Movement of molecules from high to low concentration", e:"Passive transport without energy."},
+  {q:"What is the cell wall made of?", a:"Cellulose", e:"Provides structure and protection for plant cells."},
+  {q:"Identify the organelle responsible for detoxifying chemicals.", a:"Smooth ER", e:"Smooth ER metabolizes toxins and synthesizes lipids.", img:"img/diagram4.png"},
+  {q:"What is the function of lysosomes?", a:"Break down waste and cellular debris", e:"Contain digestive enzymes."},
+  {q:"Define tissue.", a:"Group of similar cells performing a function", e:"E.g., muscle tissue."},
+  {q:"Define organ.", a:"Group of tissues performing a function", e:"E.g., heart."},
+  {q:"Name the pigment responsible for green color in plants.", a:"Chlorophyll", e:"Captures light energy for photosynthesis."},
+  {q:"Identify the structure labeled in the diagram.", a:"Endoplasmic Reticulum", e:"ER transports proteins and lipids.", img:"img/diagram5.png"},
+  {q:"What is the function of the Golgi apparatus?", a:"Modify, sort, and package proteins", e:"Prepares proteins for transport."},
+  {q:"Define homeostasis.", a:"Maintenance of stable internal conditions", e:"Essential for survival."},
+  {q:"What is the function of vacuoles?", a:"Storage of water and nutrients", e:"Large central vacuole in plants maintains turgor pressure."},
+  {q:"Identify the structure in the diagram.", a:"Cytoplasm", e:"Cytoplasm is where chemical reactions occur.", img:"img/diagram6.png"},
+  {q:"Define prokaryote.", a:"Organism without nucleus", e:"Bacteria are prokaryotic."},
+  {q:"Define eukaryote.", a:"Organism with nucleus", e:"Animals, plants, fungi are eukaryotic."},
+  {q:"What is the function of the plasma membrane?", a:"Controls movement in/out of cell", e:"Also provides protection."},
+  {q:"What is a chromosome?", a:"Structure containing DNA", e:"Found in nucleus."},
+  {q:"Define enzyme.", a:"Protein that speeds up chemical reactions", e:"Acts as biological catalyst."},
+  {q:"Identify the enzyme in the diagram.", a:"Amylase", e:"Breaks down starch to sugar.", img:"img/diagram7.png"},
+  {q:"What is photosynthesis equation?", a:"6CO2 + 6H2O → C6H12O6 + 6O2", e:"Plants convert CO2 and water to glucose and oxygen."},
+  {q:"Define respiration.", a:"Process of releasing energy from glucose", e:"Aerobic or anaerobic."},
+  {q:"What is ATP?", a:"Energy currency of cell", e:"Adenosine Triphosphate stores energy."},
+  {q:"Identify the structure in the diagram.", a:"Nucleolus", e:"Produces ribosomes.", img:"img/diagram8.png"},
+  {q:"Define mitosis.", a:"Cell division producing two identical cells", e:"Used for growth and repair."},
+  {q:"Define meiosis.", a:"Cell division producing gametes", e:"Reduces chromosome number by half."},
+  {q:"What is the function of centrioles?", a:"Organize spindle fibers during cell division", e:"Found in animal cells."},
+  {q:"Define gene.", a:"Unit of heredity", e:"Sequence of DNA coding for protein."},
+  {q:"What is the function of DNA?", a:"Stores genetic information", e:"Codes for proteins."},
+  {q:"Identify the structure in the diagram.", a:"Chromatin", e:"Uncoiled DNA in nucleus.", img:"img/diagram9.png"},
+  {q:"Define organ system.", a:"Group of organs performing a function", e:"E.g., digestive system."},
+  {q:"What is the function of the circulatory system?", a:"Transport blood, nutrients, and gases", e:"Heart, blood, vessels involved."},
+  {q:"What is the function of the respiratory system?", a:"Exchange of gases", e:"Oxygen in, carbon dioxide out."},
+  {q:"Define excretion.", a:"Removal of metabolic waste", e:"Kidneys, lungs, skin involved."},
+  {q:"Define nutrition.", a:"Process of obtaining food", e:"Includes ingestion, digestion, absorption."},
+  {q:"What is the function of the skeletal system?", a:"Support and protection", e:"Bones and cartilage form framework."},
+  {q:"What is the function of the muscular system?", a:"Movement of body parts", e:"Muscles contract to produce motion."},
+  {q:"Define homeostasis in humans.", a:"Maintenance of stable internal environment", e:"Includes temperature, pH, glucose levels."},
+  {q:"Identify the structure in the diagram.", a:"Neuron", e:"Transmits nerve impulses.", img:"img/diagram10.png"},
+  {q:"Define reflex action.", a:"Automatic response to stimulus", e:"Does not involve conscious thought."},
+  {q:"What is a hormone?", a:"Chemical messenger", e:"Secreted by endocrine glands."},
+  {q:"Identify the gland in the diagram.", a:"Pituitary gland", e:"Controls other endocrine glands.", img:"img/diagram11.png"},
+  {q:"Define enzyme-substrate complex.", a:"Temporary binding of enzyme to substrate", e:"Leads to product formation."},
+  {q:"What is denaturation?", a:"Change in protein structure", e:"Loss of function due to heat or pH."},
+  {q:"Define osmoregulation.", a:"Control of water and salt balance", e:"Performed by kidneys."},
+  {q:"What is the function of red blood cells?", a:"Transport oxygen", e:"Contain hemoglobin."},
+  {q:"What is the function of white blood cells?", a:"Defend against pathogens", e:"Part of immune system."},
+  {q:"Define antigen.", a:"Substance causing immune response", e:"Recognized as foreign by immune system."},
+  {q:"Define antibody.", a:"Protein that neutralizes antigen", e:"Produced by B-cells."},
+  {q:"Identify the structure in the diagram.", a:"Heart", e:"Pumps blood to body.", img:"img/diagram12.png"},
+  {q:"Define artery.", a:"Blood vessel carrying blood away from heart", e:"Usually oxygenated."},
+  {q:"Define vein.", a:"Blood vessel carrying blood to heart", e:"Usually deoxygenated."},
+  {q:"Define capillary.", a:"Smallest blood vessel", e:"Exchange of gases and nutrients occurs."},
+  {q:"What is the function of platelets?", a:"Blood clotting", e:"Prevent excessive bleeding."},
+  {q:"Define pulmonary circulation.", a:"Heart to lungs and back", e:"Oxygenates blood."},
+  {q:"Define systemic circulation.", a:"Heart to body and back", e:"Supplies oxygen and nutrients."},
+  {q:"Define lymph.", a:"Fluid in lymphatic system", e:"Transports immune cells."},
+  {q:"Define ecosystem.", a:"Interaction of living and non-living things", e:"Includes plants, animals, and environment."},
+  {q:"Define producer.", a:"Organism that makes its own food", e:"Plants are producers."},
+  {q:"Define consumer.", a:"Organism that eats other organisms", e:"Animals are consumers."},
+  {q:"Define decomposer.", a:"Organism that breaks down dead matter", e:"Fungi and bacteria."},
+  {q:"Identify the structure in the diagram.", a:"Food web", e:"Shows feeding relationships.", img:"img/diagram13.png"},
+  {q:"Define biodiversity.", a:"Variety of species in ecosystem", e:"Higher biodiversity increases stability."},
+  {q:"What is the function of stomata?", a:"Gas exchange in leaves", e:"CO2 in, O2 out."},
+  {q:"Define transpiration.", a:"Loss of water from leaves", e:"Helps in water movement through plants."},
+  {q:"Define photosynthetic pigments.", a:"Molecules that absorb light", e:"Chlorophyll a, b, carotenoids."},
+  {q:"Define biotic factor.", a:"Living component of ecosystem", e:"Includes plants, animals."},
+  {q:"Define abiotic factor.", a:"Non-living component of ecosystem", e:"Includes temperature, water, soil."},
+  {q:"Define carrying capacity.", a:"Maximum population environment can support", e:"Depends on resources."},
+  {q:"Identify the structure in the diagram.", a:"Flower", e:"Reproductive organ of plant.", img:"img/diagram14.png"},
+  {q:"Define pollination.", a:"Transfer of pollen to stigma", e:"Leads to fertilization."},
+  {q:"Define fertilization.", a:"Fusion of sperm and egg", e:"Produces zygote."},
+  {q:"Define seed dispersal.", a:"Movement of seeds away from parent plant", e:"Wind, water, animals aid dispersal."},
+  {q:"Define adaptation.", a:"Feature aiding survival", e:"Structural, behavioral, physiological adaptations."},
+  {q:"Define natural selection.", a:"Survival of fittest", e:"Favorable traits increase in population."},
+  {q:"Define evolution.", a:"Change in species over time", e:"Occurs via natural selection."},
+  {q:"Define mutation.", a:"Change in DNA sequence", e:"Can be beneficial, neutral, or harmful."},
+  {q:"Define habitat.", a:"Place where organism lives", e:"Provides resources and shelter."},
+  {q:"Define niche.", a:"Role of organism in ecosystem", e:"Includes feeding, reproduction, and interactions."},
+  {q:"Identify the structure in the diagram.", a:"Leaf cross-section", e:"Shows stomata, mesophyll.", img:"img/diagram15.png"},
+  {q:"Define food chain.", a:"Sequence of organisms eating each other", e:"Shows energy transfer."},
+  {q:"Define energy pyramid.", a:"Shows energy flow in ecosystem", e:"Energy decreases at higher trophic levels."},
+  {q:"Define symbiosis.", a:"Interaction between species", e:"Mutualism, commensalism, parasitism."},
+  {q:"Define parasitism.", a:"One benefits, other harmed", e:"Example: ticks on mammals."},
+  {q:"Define mutualism.", a:"Both species benefit", e:"Example: bees and flowers."},
+  {q:"Define commensalism.", a:"One benefits, other unaffected", e:"Example: barnacles on whales."},
+  {q:"Define population.", a:"Group of same species in area", e:"Population dynamics affect ecosystem."},
+  {q:"Define community.", a:"Different populations in area", e:"Interacting species form community."},
+  {q:"Define biome.", a:"Large area with similar climate and organisms", e:"Example: rainforest, desert."},
+  {q:"Define respiration in plants.", a:"Release of energy from glucose", e:"Occurs in mitochondria."},
+  {q:"Define transpiration pull.", a:"Water movement through xylem due to evaporation", e:"Maintains water column."},
+  {q:"Define phloem transport.", a:"Movement of food from leaves to other parts", e:"Translocation process."},
+  {q:"Define xylem transport.", a:"Movement of water from roots to leaves", e:"Transpiration stream."},
+  {q:"Define photosystem.", a:"Protein-pigment complex capturing light", e:"Found in chloroplasts."},
+  {q:"Identify the structure in the diagram.", a:"Root cross-section", e:"Shows xylem, phloem, cortex.", img:"img/diagram16.png"},
+  {q:"Define meristem.", a:"Region of cell division in plants", e:"Apical, lateral meristems."},
+  {q:"Define tropism.", a:"Growth response to stimulus", e:"Phototropism, geotropism."},
+  {q:"Define phototropism.", a:"Growth towards light", e:"Auxins regulate growth."},
+  {q:"Define geotropism.", a:"Growth in response to gravity", e:"Roots grow downward."},
+  {q:"Define hydrotropism.", a:"Growth towards water", e:"Roots grow toward water source."},
+  {q:"Define thigmotropism.", a:"Growth response to touch", e:"Example: climbing plants."},
+  {q:"Identify the structure in the diagram.", a:"Seed germination stages", e:"Shows radicle, plumule.", img:"img/diagram17.png"},
+  {q:"Define transpiration rate factors.", a:"Temperature, humidity, wind, light", e:"Affect water loss from leaves."},
+  {q:"Define stomatal density.", a:"Number of stomata per leaf area", e:"Affects gas exchange and transpiration."},
+  {q:"Define guard cells.", a:"Cells controlling stomatal opening", e:"Regulate transpiration."},
+  {q:"Define cuticle in plants.", a:"Wax layer reducing water loss", e:"Protects leaves."},
+  {q:"Define soil texture.", a:"Proportion of sand, silt, clay", e:"Affects water retention and root growth."},
+  {q:"Define nutrient cycle.", a:"Movement of nutrients through ecosystem", e:"Nitrogen, carbon cycles."},
+  {q:"Define nitrogen fixation.", a:"Conversion of N2 to usable forms", e:"Performed by bacteria."},
+  {q:"Define carbon cycle.", a:"Movement of carbon between atmosphere, organisms, soil", e:"Includes photosynthesis and respiration."},
+  {q:"Define greenhouse effect.", a:"Trapping of heat by atmosphere", e:"Increases global temperature."},
+  {q:"Define ozone layer.", a:"Protects Earth from UV radiation", e:"Located in stratosphere."},
+  {q:"Define climate change.", a:"Long-term alteration of climate", e:"Caused by human activity and natural factors."},
+  {q:"Define deforestation.", a:"Removal of trees", e:"Leads to habitat loss and climate change."},
+  {q:"Define pollution.", a:"Introduction of harmful substances", e:"Air, water, soil pollution."},
+  {q:"Define conservation.", a:"Protection of natural resources", e:"Ensures sustainability."},
+  {q:"Define renewable resource.", a:"Resource that can be replenished", e:"Solar, wind, water energy."},
+  {q:"Define non-renewable resource.", a:"Resource that cannot be replenished quickly", e:"Fossil fuels."},
+  {q:"Identify the structure in the diagram.", a:"Animal cell vs Plant cell", e:"Shows cell wall, chloroplast.", img:"img/diagram18.png"},
+  {q:"Define mitotic spindle.", a:"Structure separating chromosomes", e:"Formed during mitosis."},
+  {q:"Define homologous chromosomes.", a:"Chromosomes carrying same genes", e:"One from each parent."},
+  {q:"Define gamete.", a:"Sex cell (sperm or egg)", e:"Haploid."},
+  {q:"Define zygote.", a:"Fertilized egg", e:"Diploid."},
+  {q:"Define dominant allele.", a:"Expressed when present", e:"Masks recessive allele."},
+  {q:"Define recessive allele.", a:"Expressed only when homozygous", e:"Hidden if dominant present."},
+  {q:"Define genotype.", a:"Genetic makeup of organism", e:"Combination of alleles."},
+  {q:"Define phenotype.", a:"Observable trait", e:"Physical expression of genotype."},
+  {q:"Define heterozygous.", a:"Two different alleles", e:"Example: Aa."},
+  {q:"Define homozygous.", a:"Two identical alleles", e:"Example: AA or aa."},
+  {q:"Define Punnett square.", a:"Diagram showing allele combinations", e:"Predicts offspring ratios."},
+  {q:"Define Mendel’s law of segregation.", a:"Alleles separate during gamete formation", e:"Each gamete gets one allele."},
+  {q:"Define Mendel’s law of independent assortment.", a:"Alleles of different genes assort independently", e:"Occurs in meiosis."},
+  {q:"Define genetic mutation.", a:"Change in DNA sequence", e:"May affect phenotype."},
+  {q:"Define selective breeding.", a:"Human-controlled breeding", e:"Enhances desired traits."},
+  {q:"Define biotechnology.", a:"Use of living organisms for products", e:"Includes genetic engineering."},
+  {q:"Define cloning.", a:"Producing identical organism", e:"Can be natural or artificial."},
+  {q:"Define stem cells.", a:"Undifferentiated cells", e:"Can become various cell types."},
+  {q:"Define tissue culture.", a:"Growing cells outside organism", e:"Used in plant propagation."},
+  {q:"Define genetic engineering.", a:"Modification of organism’s DNA", e:"Produces GMOs."
+
